@@ -1,7 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 
 async function getAccessToken() {
-  console.log('begin access token')
     const params = new URLSearchParams({
       grant_type: 'client_credentials',
       client_id: process.env.SF_CLIENT_ID!,
@@ -31,6 +30,7 @@ async function getAccessToken() {
   }
 
 export default async (req: Request, context: Context) => {
+  console.log('begin get access token');
     const { access_token } = await getAccessToken();
 
     console.log('access token success');
@@ -59,5 +59,6 @@ export default async (req: Request, context: Context) => {
 }
 
 export const config = {
-    path: "/klaviyo-to-salesforce"
+    path: "/klaviyo-to-salesforce",
+    method: 'GET',
 } satisfies Config;
