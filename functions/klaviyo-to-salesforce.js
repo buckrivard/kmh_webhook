@@ -34,7 +34,9 @@ export default async (req, context) => {
         throw new Error(`Salesforce API error: ${await sfResponse.text()}`);
     }
     const result = await sfResponse.json();
+    console.log(result);
 };
 export const config = {
     path: "/klaviyo-to-salesforce"
 };
+//# sourceMappingURL=klaviyo-to-salesforce.js.map
