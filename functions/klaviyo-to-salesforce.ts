@@ -1,6 +1,7 @@
 import type { Config, Context } from "@netlify/functions";
 
 async function getAccessToken() {
+  console.log('begin access token')
     const params = new URLSearchParams({
       grant_type: 'client_credentials',
       client_id: process.env.SF_CLIENT_ID!,
@@ -17,6 +18,7 @@ async function getAccessToken() {
         body: params
       }
     );
+    console.log('unwrapping access token response')
   
     if (!response.ok) {
       console.error('error getting access token');
