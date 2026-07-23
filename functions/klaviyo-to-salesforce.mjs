@@ -11,7 +11,6 @@ async function getAccessToken() {
         },
         body: params
     });
-    console.log('unwrapping access token response');
     if (!response.ok) {
         console.error('error getting access token');
         throw new Error(await response.text());
@@ -19,11 +18,14 @@ async function getAccessToken() {
     return response.json();
 }
 export default async (req, context) => {
-    console.log('begin get access token');
     const { access_token } = await getAccessToken();
-    console.log('access token success');
     // Replace the following object with your actual new account data
-    const newAccountData = {};
+    const newAccountData = {
+        FirstName: 'John',
+        LastName: 'Doe',
+        Company: 'Acme Inc'
+    };
+    console.log('newAccountData', newAccountData);
     const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;
     const sfResponse = await fetch(salesforceUrl, {
         method: "POST",
