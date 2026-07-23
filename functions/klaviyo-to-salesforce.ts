@@ -19,6 +19,7 @@ async function getAccessToken() {
     );
   
     if (!response.ok) {
+      console.error('error getting access token');
       throw new Error(await response.text());
     }
   
@@ -30,12 +31,13 @@ async function getAccessToken() {
 export default async (req: Request, context: Context) => {
     const { access_token } = await getAccessToken();
 
+    console.log('access token success');
+
     // Replace the following object with your actual new account data
     const newAccountData = {
     };
 
-    const salesforceDomain = "https://MyDomainName.my.salesforce.com";
-    const salesforceUrl = `${salesforceDomain}/services/data/v67.0/sobjects/Lead/`;
+    const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;
 
     const sfResponse = await fetch(salesforceUrl, {
         method: "POST",
