@@ -30,32 +30,33 @@ async function getAccessToken() {
   }
 
 export default async (req: Request, context: Context) => {
-  console.log('begin get access token');
-    const { access_token } = await getAccessToken();
+  return new Response('Hello, world!');
+  // console.log('begin get access token');
+  //   const { access_token } = await getAccessToken();
 
-    console.log('access token success');
+  //   console.log('access token success');
 
-    // Replace the following object with your actual new account data
-    const newAccountData = {
-    };
+  //   // Replace the following object with your actual new account data
+  //   const newAccountData = {
+  //   };
 
-    const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;
+  //   const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;
 
-    const sfResponse = await fetch(salesforceUrl, {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${access_token}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(newAccountData)
-    });
+  //   const sfResponse = await fetch(salesforceUrl, {
+  //       method: "POST",
+  //       headers: {
+  //           "Authorization": `Bearer ${access_token}`,
+  //           "Content-Type": "application/json"
+  //       },
+  //       body: JSON.stringify(newAccountData)
+  //   });
 
-    if (!sfResponse.ok) {
-        throw new Error(`Salesforce API error: ${await sfResponse.text()}`);
-    }
+  //   if (!sfResponse.ok) {
+  //       throw new Error(`Salesforce API error: ${await sfResponse.text()}`);
+  //   }
 
-    const result = await sfResponse.json();
-    console.log(result);
+  //   const result = await sfResponse.json();
+  //   console.log(result);
 }
 
 export const config = {
