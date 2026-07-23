@@ -37,6 +37,7 @@ export default async (req: Request, context: Context) => {
     LastName: 'Doe',
     Company: 'Acme Inc'
   };
+  console.log('newAccountData', newAccountData);
 
   const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;
 
