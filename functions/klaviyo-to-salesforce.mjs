@@ -44,4 +44,3 @@ export const config = {
     path: "/klaviyo-to-salesforce",
     method: 'GET',
 };
-//# sourceMappingURL=klaviyo-to-salesforce.mjs.map
