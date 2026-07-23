@@ -29,12 +29,13 @@ async function getAccessToken() {
 }
 
 export default async (req: Request, context: Context) => {
-  console.log('begin get access token');
   const { access_token } = await getAccessToken();
 
   // Replace the following object with your actual new account data
   const newAccountData = {
-    LastName: 'Test',
+    FirstName: 'John',
+    LastName: 'Doe',
+    Company: 'Acme Inc'
   };
 
   const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;
