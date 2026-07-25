@@ -72,6 +72,7 @@ const klaviyoToSalesforceSchema = z.object({
 });
 export default async (req, context) => {
     const klaviyoData = req.json();
+    console.log('klaviyoData', klaviyoData);
     const validatedKlaviyoData = klaviyoToSalesforceSchema.safeParse(klaviyoData);
     if (!validatedKlaviyoData.success) {
         console.error(validatedKlaviyoData.error);
