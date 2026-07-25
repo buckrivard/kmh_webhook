@@ -44,29 +44,19 @@ const klaviyoToSalesforceMap = {
   state: 'State',
   zip: 'PostalCode',
   business_type: 'Business_Type_2__c',
-  // industry_other: '00Nf2000003HDQ5',
   business_role: 'Business_Role__c',
-  // business_role_other: '00Nf2000003HDPv',
   services: 'Wholesale_Services_Interested_In__c',
-  // services_other: '00Nf2000003HDQF',
   referral_source: 'How_did_you_hear_about_us__c',
-  // referral_source_other: '00Nf200000CgvyL',
   goals: 'Long_Term_Goals__c',
   questions: 'Additional_Information__c',
   subscribe_to_newsletter: 'Receive_Newsletter_and_Notifications__c',
 } as const;
 
 type KlaviyoFields = keyof typeof klaviyoToSalesforceMap;
-type SalesforceFields = typeof klaviyoToSalesforceMap[KlaviyoFields];
-
-type SalesforceFieldToType = {
-  [key in SalesforceFields]: string | Array<string>;
-}
 
 const klaviyoToSalesforceSchema = z.object({
   website: z.string().optional(),
   business_role: z.string().optional(),
-  // business_role_other: z.string(),
   city: z.string(),
   company: z.string(),
   country: z.string(),
@@ -78,12 +68,9 @@ const klaviyoToSalesforceSchema = z.object({
   street: z.string(),
   state: z.string(),
   zip: z.string(),
-  business_type: z.string().optional(),
-  // industry_other: z.string(),
+  business_type: z.enum(['Spa/Salon/Studio', 'Wellness (i.e. acupuncture, aromatherapy, yoga)', 'Medical (i.e anti-aging, laser technology, plastic surgery)', 'Boutique/Retail', 'E-commerce/Online Store', 'Consulting/Formulating', 'Hotel/Amenity', 'Other']).optional(),
   services: z.string().optional(),
-  // services_other: z.string(),
-  referral_source: z.string().optional(),
-  // referral_source_other: z.string(),
+  referral_source: z.enum(['Web Search', 'Social Media (Facebook, etc.)', 'Lipgloss + Aftershave', 'Skin Inc. Magazine', 'Referral', 'Trade Show/Event', 'Other']).optional(),
   goals: z.string().optional(),
   questions: z.string().optional(),
   subscribe_to_newsletter: z.string().optional(),
@@ -100,8 +87,6 @@ export default async (req: Request, context: Context) => {
     return new Response(JSON.stringify({ error: validatedKlaviyoData.error.message }), { status: 400 });
   }
 
-  console.log(validatedKlaviyoData.data);
-
   const salesforceData = Object.fromEntries(Object.entries(klaviyoToSalesforceMap).map(([key, value]) => {
     if (validatedKlaviyoData.data[key as KlaviyoFields] === undefined) {
       return [value, null];
@@ -109,10 +94,9 @@ export default async (req: Request, context: Context) => {
     return [value, validatedKlaviyoData.data[key as KlaviyoFields]]
   }).filter(([_, value]) => value !== null));
 
-  console.log('post-transformed data', salesforceData);
+  console.log(salesforceData);
 
   const { access_token } = await getAccessToken();
-
 
   const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;
 
@@ -130,6 +114,7 @@ export default async (req: Request, context: Context) => {
   }
 
   const result = await sfResponse.json();
+  console.log(result);
   return new Response(JSON.stringify({ success: true }), { status: 200 });
 }
 
