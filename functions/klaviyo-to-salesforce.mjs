@@ -71,7 +71,7 @@ const klaviyoToSalesforceSchema = z.object({
     social_media_link: z.string(),
 });
 export default async (req, context) => {
-    const klaviyoData = req.json();
+    const klaviyoData = await req.json();
     console.log('klaviyoData', klaviyoData);
     const validatedKlaviyoData = klaviyoToSalesforceSchema.safeParse(klaviyoData);
     if (!validatedKlaviyoData.success) {
