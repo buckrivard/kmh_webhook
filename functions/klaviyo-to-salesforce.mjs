@@ -45,8 +45,8 @@ const klaviyoToSalesforceMap = {
     subscribe_to_newsletter: 'Receive_Newsletter_and_Notifications__c',
 };
 const klaviyoToSalesforceSchema = z.object({
-    website: z.string(),
-    business_role: z.string(),
+    website: z.string().optional(),
+    business_role: z.string().optional(),
     // business_role_other: z.string(),
     city: z.string(),
     company: z.string(),
@@ -59,16 +59,16 @@ const klaviyoToSalesforceSchema = z.object({
     street: z.string(),
     state: z.string(),
     zip: z.string(),
-    business_type: z.string(),
+    business_type: z.string().optional(),
     // industry_other: z.string(),
-    services: z.string(),
+    services: z.string().optional(),
     // services_other: z.string(),
-    referral_source: z.string(),
+    referral_source: z.string().optional(),
     // referral_source_other: z.string(),
-    goals: z.string(),
-    questions: z.string(),
-    subscribe_to_newsletter: z.string(),
-    social_media_link: z.string(),
+    goals: z.string().optional(),
+    questions: z.string().optional(),
+    subscribe_to_newsletter: z.string().optional(),
+    social_media_link: z.string().optional(),
 });
 export default async (req, context) => {
     const klaviyoData = await req.json();
@@ -78,7 +78,12 @@ export default async (req, context) => {
         return new Response(JSON.stringify({ error: validatedKlaviyoData.error.message }), { status: 400 });
     }
     console.log(validatedKlaviyoData.data);
-    const salesforceData = Object.fromEntries(Object.entries(klaviyoToSalesforceMap).map(([key, value]) => [value, validatedKlaviyoData.data[key]]));
+    const salesforceData = Object.fromEntries(Object.entries(klaviyoToSalesforceMap).map(([key, value]) => {
+        if (validatedKlaviyoData.data[key] === undefined) {
+            return [value, null];
+        }
+        return [value, validatedKlaviyoData.data[key]];
+    }).filter(([_, value]) => value !== null));
     console.log('post-transformed data', salesforceData);
     const { access_token } = await getAccessToken();
     const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;

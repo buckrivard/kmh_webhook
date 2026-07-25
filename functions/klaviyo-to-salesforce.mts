@@ -64,8 +64,8 @@ type SalesforceFieldToType = {
 }
 
 const klaviyoToSalesforceSchema = z.object({
-  website: z.string(),
-  business_role: z.string(),
+  website: z.string().optional(),
+  business_role: z.string().optional(),
   // business_role_other: z.string(),
   city: z.string(),
   company: z.string(),
@@ -78,16 +78,16 @@ const klaviyoToSalesforceSchema = z.object({
   street: z.string(),
   state: z.string(),
   zip: z.string(),
-  business_type: z.string(),
+  business_type: z.string().optional(),
   // industry_other: z.string(),
-  services: z.string(),
+  services: z.string().optional(),
   // services_other: z.string(),
-  referral_source: z.string(),
+  referral_source: z.string().optional(),
   // referral_source_other: z.string(),
-  goals: z.string(),
-  questions: z.string(),
-  subscribe_to_newsletter: z.string(),
-  social_media_link: z.string(),
+  goals: z.string().optional(),
+  questions: z.string().optional(),
+  subscribe_to_newsletter: z.string().optional(),
+  social_media_link: z.string().optional(),
 
 } satisfies Record<KlaviyoFields, z.ZodType<any>>);
 
@@ -102,7 +102,12 @@ export default async (req: Request, context: Context) => {
 
   console.log(validatedKlaviyoData.data);
 
-  const salesforceData = Object.fromEntries(Object.entries(klaviyoToSalesforceMap).map(([key, value]) => [value, validatedKlaviyoData.data[key as KlaviyoFields]]));
+  const salesforceData = Object.fromEntries(Object.entries(klaviyoToSalesforceMap).map(([key, value]) => {
+    if (validatedKlaviyoData.data[key as KlaviyoFields] === undefined) {
+      return [value, null];
+    }
+    return [value, validatedKlaviyoData.data[key as KlaviyoFields]]
+  }).filter(([_, value]) => value !== null));
 
   console.log('post-transformed data', salesforceData);
 
