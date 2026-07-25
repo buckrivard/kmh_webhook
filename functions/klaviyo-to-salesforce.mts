@@ -37,7 +37,7 @@ const klaviyoToSalesforceMap = {
   website: 'Website',
   social_media_link: 'Social_Media_Link__c',
   phone: 'Phone',
-  mobile: 'Mobile',
+  mobile: 'MobilePhone',
   street: 'Street',
   city: 'City',
   country: 'Country',
