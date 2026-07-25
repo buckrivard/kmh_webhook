@@ -34,7 +34,7 @@ const klaviyoToSalesforceMap = {
   last_name: 'LastName',
   email: 'email',
   company: 'company',
-  URL: 'URL',
+  website: 'Website',
   social_media_link: '00Nf2000003H5Bu',
   phone: 'phone',
   mobile: 'mobile',
@@ -64,7 +64,7 @@ type SalesforceFieldToType = {
 }
 
 const klaviyoToSalesforceSchema = z.object({
-  URL: z.string(),
+  website: z.string(),
   business_role: z.string(),
   // business_role_other: z.string(),
   city: z.string(),
@@ -93,7 +93,6 @@ const klaviyoToSalesforceSchema = z.object({
 
 export default async (req: Request, context: Context) => {
   const klaviyoData = await req.json();
-  console.log('klaviyoData', klaviyoData);
   const validatedKlaviyoData = klaviyoToSalesforceSchema.safeParse(klaviyoData);
 
   if (!validatedKlaviyoData.success) {
