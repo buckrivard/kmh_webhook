@@ -47,7 +47,7 @@ const klaviyoToSalesforceMap = {
   // industry_other: '00Nf2000003HDQ5',
   business_role: 'Business_Role__c',
   // business_role_other: '00Nf2000003HDPv',
-  services: 'Wholsesale_Services_Interested_In__c',
+  services: 'Wholesale_Services_Interested_In__c',
   // services_other: '00Nf2000003HDQF',
   referral_source: 'How_did_you_hear_about_us__c',
   // referral_source_other: '00Nf200000CgvyL',
