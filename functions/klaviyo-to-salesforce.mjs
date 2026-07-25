@@ -1,3 +1,4 @@
+import { z } from "zod";
 async function getAccessToken() {
     const params = new URLSearchParams({
         grant_type: 'client_credentials',
@@ -17,15 +18,69 @@ async function getAccessToken() {
     }
     return response.json();
 }
+const klaviyoToSalesforceMap = {
+    first_name: 'FirstName',
+    last_name: 'LastName',
+    email: 'email',
+    company: 'company',
+    URL: 'URL',
+    social_media_link: '00Nf2000003H5Bu',
+    phone: 'phone',
+    mobile: 'mobile',
+    street: 'street',
+    city: 'city',
+    country: '00Nf2000003Gbt5',
+    state: 'state',
+    zip: 'zip',
+    industry: '00Nf200000E2R5U',
+    // industry_other: '00Nf2000003HDQ5',
+    business_role: '00Nf2000003H5Bp',
+    // business_role_other: '00Nf2000003HDPv',
+    services: '00Nf200000E2QiB',
+    // services_other: '00Nf2000003HDQF',
+    referral_source: '00Nf2000009sXf8',
+    // referral_source_other: '00Nf200000CgvyL',
+    goals: '00Nf200000CgvyB',
+    questions: '00Nf2000009sYMH',
+    subscribe_to_newsletter: '00Nf2000003H9C9',
+};
+const klaviyoToSalesforceSchema = z.object({
+    URL: z.string(),
+    business_role: z.string(),
+    // business_role_other: z.string(),
+    city: z.string(),
+    company: z.string(),
+    country: z.string(),
+    email: z.string(),
+    first_name: z.string(),
+    last_name: z.string(),
+    mobile: z.string(),
+    phone: z.string(),
+    street: z.string(),
+    state: z.string(),
+    zip: z.string(),
+    industry: z.string(),
+    // industry_other: z.string(),
+    services: z.string(),
+    // services_other: z.string(),
+    referral_source: z.string(),
+    // referral_source_other: z.string(),
+    goals: z.string(),
+    questions: z.string(),
+    subscribe_to_newsletter: z.string(),
+    social_media_link: z.string(),
+});
 export default async (req, context) => {
+    const klaviyoData = req.json();
+    const validatedKlaviyoData = klaviyoToSalesforceSchema.safeParse(klaviyoData);
+    if (!validatedKlaviyoData.success) {
+        console.error(validatedKlaviyoData.error);
+        return new Response(JSON.stringify({ error: validatedKlaviyoData.error.message }), { status: 400 });
+    }
+    console.log(validatedKlaviyoData.data);
+    const salesforceData = Object.fromEntries(Object.entries(klaviyoToSalesforceMap).map(([key, value]) => [value, validatedKlaviyoData.data[key]]));
+    console.log('post-transformed data', salesforceData);
     const { access_token } = await getAccessToken();
-    // Replace the following object with your actual new account data
-    const newAccountData = {
-        FirstName: 'John',
-        LastName: 'Doe',
-        Company: 'Acme Inc'
-    };
-    console.log('newAccountData', newAccountData);
     const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;
     const sfResponse = await fetch(salesforceUrl, {
         method: "POST",
@@ -33,16 +88,15 @@ export default async (req, context) => {
             "Authorization": `Bearer ${access_token}`,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(newAccountData)
+        body: JSON.stringify(salesforceData)
     });
     if (!sfResponse.ok) {
         throw new Error(`Salesforce API error: ${await sfResponse.text()}`);
     }
     const result = await sfResponse.json();
-    console.log(result);
-    return new Response(JSON.stringify(result), { status: 200 });
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
 };
 export const config = {
     path: "/klaviyo-to-salesforce",
-    method: 'GET',
+    method: 'POST',
 };
