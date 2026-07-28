@@ -71,9 +71,8 @@ const klaviyoToSalesforceSchema = z.object({
   business_type: z.enum(['Spa/Salon/Studio', 'Wellness (i.e. acupuncture, aromatherapy, yoga)', 'Medical (i.e anti-aging, laser technology, plastic surgery)', 'Boutique/Retail', 'E-commerce/Online Store', 'Consulting/Formulating', 'Hotel/Amenity', 'Other']).optional(),
   services: z.string().prefault('').transform((value) => {
     if (value === '') return null;
-    const json = JSON.parse(value);
-    if (Array.isArray(json)) return json.map((i) => i).join(';');
-    return null
+    const values = [...value.matchAll(/'([^']*)'/g)].map(match => match[1]);
+    return values.join(";");
   }),
   referral_source: z.enum(['Web Search', 'Social Media (Facebook, etc.)', 'Lipgloss + Aftershave', 'Skin Inc. Magazine', 'Referral', 'Trade Show/Event', 'Other']).optional(),
   goals: z.string().optional(),
