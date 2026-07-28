@@ -45,7 +45,7 @@ const klaviyoToSalesforceMap = {
   zip: 'PostalCode',
   business_type: 'Business_Type_2__c',
   business_role: 'Business_Role__c',
-  services: 'Wholesale_Services_Interested_In__c',
+  services: 'Wholesale_Services_Interested_In_2__c',
   referral_source: 'How_did_you_hear_about_us__c',
   goals: 'Long_Term_Goals__c',
   questions: 'Additional_Information__c',
@@ -69,7 +69,7 @@ const klaviyoToSalesforceSchema = z.object({
   state: z.string(),
   zip: z.string(),
   business_type: z.enum(['Spa/Salon/Studio', 'Wellness (i.e. acupuncture, aromatherapy, yoga)', 'Medical (i.e anti-aging, laser technology, plastic surgery)', 'Boutique/Retail', 'E-commerce/Online Store', 'Consulting/Formulating', 'Hotel/Amenity', 'Other']).optional(),
-  services: z.string().optional(),
+  services: z.string().optional().transform((value) => value?.split(',').map((item) => `${item.trim()}`).join(';')),
   referral_source: z.enum(['Web Search', 'Social Media (Facebook, etc.)', 'Lipgloss + Aftershave', 'Skin Inc. Magazine', 'Referral', 'Trade Show/Event', 'Other']).optional(),
   goals: z.string().optional(),
   questions: z.string().optional(),
@@ -82,6 +82,7 @@ export default async (req: Request, context: Context) => {
   const klaviyoData = await req.json();
   console.log('unparsed', klaviyoData);
   const validatedKlaviyoData = klaviyoToSalesforceSchema.safeParse(klaviyoData);
+  console.log('validated', validatedKlaviyoData);
 
   if (!validatedKlaviyoData.success) {
     console.error(validatedKlaviyoData.error);
