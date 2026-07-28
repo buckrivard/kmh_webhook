@@ -10,9 +10,10 @@
     "street": "{{ person.address1 }}",
     "state": "{{ person.region }}",
     "zip": "{{ person.zip }}",
-    "referral_source": "{{ person['Referral Source'] }}",
-    "business_type": "{{ person['Business Type'] }}",
-    "goals": "{{ person['Goals'] }}",
-    "questions": "{{ person['Additional Comments'] }}",
-    "social_media_link": "{{ person['Social Media'] }}"
+    "referral_source": "{{ person|lookup:'Referral Source' }}",
+    "business_type": "{{ person|lookup:'Business Type' }}",
+    "goals": "{{ person|lookup:'Goals' }}",
+    "questions": "{{ person|lookup:'Additional Comments' }}",
+    "social_media_link": "{{ person|lookup:'Social Media' }}",
+    "services": "{{ person.Services }}"
 }
