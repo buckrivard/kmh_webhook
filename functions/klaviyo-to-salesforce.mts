@@ -63,7 +63,7 @@ const klaviyoToSalesforceSchema = z.object({
   email: z.string(),
   first_name: z.string(),
   last_name: z.string(),
-  mobile: z.string(),
+  mobile: z.string().optional(),
   phone: z.string(),
   street: z.string(),
   state: z.string(),
