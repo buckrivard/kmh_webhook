@@ -1,0 +1,18 @@
+{
+    "website": "{{ person.Website }}",
+    "city": "{{ person.city }}",
+    "company": "{{ person.organization }}",
+    "country": "{{ person.country }}",
+    "email": "{{ person.email }}",
+    "first_name": "{{ person.first_name }}",
+    "last_name": "{{ person.last_name }}",
+    "phone": "{{ person.phone_number }}",
+    "street": "{{ person.address1 }}",
+    "state": "{{ person.region }}",
+    "zip": "{{ person.zip }}",
+    "referral_source": "{{ person['Referral Source'] }}",
+    "business_type": "{{ person['Business Type'] }}",
+    "goals": "{{ person['Goals'] }}",
+    "questions": "{{ person['Additional Comments'] }}",
+    "social_media_link": "{{ person['Social Media'] }}"
+}
