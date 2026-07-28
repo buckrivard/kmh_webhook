@@ -1,5 +1,10 @@
 import type { Config, Context } from "@netlify/functions";
 import { z } from "zod";
+import { IncomingWebhook } from '@slack/webhook';
+
+const url = process.env.SLACK_WEBHOOK_URL;
+
+const webhook = new IncomingWebhook(url ?? '');
 
 async function getAccessToken() {
   const params = new URLSearchParams({
@@ -21,6 +26,7 @@ async function getAccessToken() {
 
   if (!response.ok) {
     console.error('error getting access token');
+    await webhook.send('failed to get salesforce access token');
     throw new Error(await response.text());
   }
 
@@ -84,12 +90,11 @@ const klaviyoToSalesforceSchema = z.object({
 
 export default async (req: Request, context: Context) => {
   const klaviyoData = await req.json();
-  console.log('unparsed', klaviyoData);
   const validatedKlaviyoData = klaviyoToSalesforceSchema.safeParse(klaviyoData);
-  console.log('validated', validatedKlaviyoData);
 
   if (!validatedKlaviyoData.success) {
     console.error(validatedKlaviyoData.error);
+    await webhook.send('failed to validate klaviyo data');
     return new Response(JSON.stringify({ error: validatedKlaviyoData.error.message }), { status: 400 });
   }
 
@@ -100,28 +105,37 @@ export default async (req: Request, context: Context) => {
     return [value, validatedKlaviyoData.data[key as KlaviyoFields]]
   }).filter(([_, value]) => value !== null));
 
-  console.log(salesforceData);
-
   const { access_token } = await getAccessToken();
 
   const salesforceUrl = `${process.env.SF_LOGIN_URL}/services/data/v67.0/sobjects/Lead/`;
 
-  const sfResponse = await fetch(salesforceUrl, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${access_token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(salesforceData)
-  });
+  try {
+    const sfResponse = await fetch(salesforceUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${access_token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(salesforceData)
+    });
 
-  if (!sfResponse.ok) {
-    throw new Error(`Salesforce API error: ${await sfResponse.text()}`);
+    if (!sfResponse.ok) {
+      await webhook.send('failed to create lead in salesforce');
+      throw new Error(`Salesforce API error: ${await sfResponse.text()}`);
+    }
+
+    try {
+      const result = await sfResponse.json();
+      await webhook.send('successfuly created lead in salesforce');
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
+    } catch (error) {
+      await webhook.send('failed to create lead in salesforce');
+      return new Response(JSON.stringify({ error: error }), { status: 500 });
+    }
+  } catch (error) {
+    await webhook.send('failed to create lead in salesforce');
+    return new Response(JSON.stringify({ error: error }), { status: 500 });
   }
-
-  const result = await sfResponse.json();
-  console.log(result);
-  return new Response(JSON.stringify({ success: true }), { status: 200 });
 }
 
 export const config = {
